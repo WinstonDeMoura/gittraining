@@ -2,7 +2,7 @@ const groups = [
   {
     title: 'Arquivo de trabalho',
     commands: [
-      { cmd: 'edit <campo> <valor>', desc: 'simula uma alteração no arquivo (fica pendente, ainda não commitada)' },
+      { cmd: 'edit <campo> <valor>', desc: 'simula uma alteração no arquivo (ou clique nos campos do painel "Arquivo do projeto" acima do terminal)' },
       { cmd: 'git status', desc: 'mostra a branch atual, alterações pendentes e conflitos em aberto' },
       { cmd: 'git log', desc: 'lista o histórico de commits da branch atual' },
     ],
@@ -32,6 +32,7 @@ const groups = [
     commands: [
       { cmd: 'git fetch', desc: 'busca novidades da branch remota, sem aplicar nada ainda' },
       { cmd: 'git pull', desc: 'busca e já aplica as novidades (fetch + merge)' },
+      { cmd: 'git push [-u origin <branch>]', desc: 'envia seus commits locais para a branch remota (bloqueia se origin tiver commits que você não tem)' },
       { cmd: 'git stash [push|pop|list]', desc: 'guarda ou recupera alterações não commitadas temporariamente' },
       { cmd: 'git reset --hard <ref>', desc: 'descarta tudo e aponta a branch para outro commit (cuidado!)' },
     ],

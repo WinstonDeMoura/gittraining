@@ -2,8 +2,9 @@ import { forwardRef, useCallback, useImperativeHandle, useState } from 'react'
 import GitTerminal from './GitTerminal.jsx'
 import GitGraph from './GitGraph.jsx'
 import CommandReference from './CommandReference.jsx'
+import FileEditor from './FileEditor.jsx'
 import { getScenario } from '../git-sim/scenarios.js'
-import { runCommand } from '../git-sim/gitEngine.js'
+import { runCommand, applyFieldEdit } from '../git-sim/gitEngine.js'
 
 function welcomeMessage(scenario) {
   return `Cenário carregado: ${scenario.label}\n${scenario.description}`
@@ -35,6 +36,19 @@ const GitSandbox = forwardRef(function GitSandbox(_props, ref) {
     ])
   }
 
+  function handleEditField(field, value) {
+    const { state, output } = applyFieldEdit(engineState, field, value)
+    setEngineState(state)
+    setTranscript((t) => [
+      ...t,
+      { type: 'input', text: `edit ${field} "${value}"` },
+      { type: 'output', text: output },
+    ])
+  }
+
+  const headTip = engineState.branches[engineState.head]
+  const snapshot = { ...engineState.commits[headTip].snapshot, ...engineState.pendingEdits }
+
   return (
     <div id="git-sandbox" className="scroll-mt-24 rounded-2xl bg-surface-light p-5 ring-1 ring-white/10">
       <div className="mb-4">
@@ -43,6 +57,10 @@ const GitSandbox = forwardRef(function GitSandbox(_props, ref) {
           Cenário atual: <span className="font-semibold text-indigo-300">{scenario.label}</span> —{' '}
           {scenario.description}
         </p>
+      </div>
+
+      <div className="mb-4">
+        <FileEditor snapshot={snapshot} dirty={engineState.dirty} onSave={handleEditField} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
