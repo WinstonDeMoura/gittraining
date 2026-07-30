@@ -12,7 +12,7 @@ export default function Header({ version, environment, projectStatus }) {
       <div className="mx-auto flex max-w-6xl flex-col gap-3 px-6 py-6 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-            🧑‍🤝‍🧑 Mural da Equipe
+            🔀 Git Training Sandbox
           </h1>
           <p className="mt-1 text-sm text-slate-400">{projectStatus}</p>
         </div>
