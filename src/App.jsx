@@ -8,8 +8,8 @@ import { projectInfo } from './data/sandboxProject.js'
 export default function App() {
   const sandboxRef = useRef(null)
 
-  function handlePractice(exerciseNumber) {
-    sandboxRef.current?.loadScenario(`ex${exerciseNumber}`)
+  function handlePractice(scenarioId) {
+    sandboxRef.current?.loadScenario(scenarioId)
     document.getElementById('git-sandbox')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
@@ -22,11 +22,11 @@ export default function App() {
       />
 
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-8 px-6 py-10">
+        <ExerciseGuide onPractice={handlePractice} />
         <GitSandbox ref={sandboxRef} />
       </main>
 
       <Footer />
-      <ExerciseGuide onPractice={handlePractice} />
     </div>
   )
 }
