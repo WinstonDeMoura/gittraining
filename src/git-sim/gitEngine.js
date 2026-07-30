@@ -354,6 +354,7 @@ export function runCommand(rawInput, prevState) {
           '  git reset --hard <ref>',
           '  git stash [push|pop|list]',
           '  git fetch | git pull [<branch>]',
+          '  git push [-u origin <branch>] [--force-with-lease]',
           '  resolve <campo> ours|theirs|"valor"',
           '  clear',
         ].join('\n'),
@@ -656,10 +657,37 @@ export function runCommand(rawInput, prevState) {
       return ok('Alterações adicionadas à área de stage (simulado — não é necessário neste sandbox).')
     }
 
+    if (sub === 'push') {
+      const blocked = requireCleanState(state)
+      if (blocked) return err(blocked)
+      const force = args.includes('--force') || args.includes('--force-with-lease')
+      const positional = args.filter((a) => a !== 'origin' && a !== '-u' && !a.startsWith('--'))
+      const name = positional[0] ?? state.head
+      const localTip = state.branches[name]
+      if (!localTip) return err(`branch "${name}" não existe localmente.`)
+      const remoteTip = state.remoteBranches[name]
+      if (remoteTip && !force && !isAncestor(state.commits, remoteTip, localTip)) {
+        return err(
+          `rejected: origin/${name} tem commits que você ainda não tem localmente. Rode "git fetch" e "git merge"/"git rebase" antes de enviar (ou use --force-with-lease se reescreveu o histórico).`,
+        )
+      }
+      state.remoteBranches[name] = localTip
+      return ok(`Enviado: origin/${name} agora aponta para ${shortId(localTip)}.`)
+    }
+
     return err(`comando "git ${sub}" não reconhecido (digite "help")`)
   } catch (e) {
     return err(`erro inesperado: ${e.message}`)
   }
+}
+
+// Mesmo efeito do comando "edit <campo> <valor>", mas chamado direto por um
+// formulário da interface (sem passar por tokenização de string).
+export function applyFieldEdit(prevState, key, value) {
+  const state = cloneState(prevState)
+  state.pendingEdits[key] = value
+  state.dirty = true
+  return { state, output: `Diretório de trabalho alterado: ${key} = "${value}"`, isError: false }
 }
 
 export function seedRemoteFeed(state, branch, entries) {
